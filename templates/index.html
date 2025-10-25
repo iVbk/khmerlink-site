@@ -96,7 +96,11 @@
   </div>
   <script>
     const apiBase = '';
-    function slugify(text){
+function slugify(text) {
+  return text.toString().trim().replace(/\s+/g, '-');
+}
+   function slugify(text){
+  return text.toString().trim().replace(/\s+/g,'-');}function slugify(text){
       return text.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^\w\-]+/g,'').replace(/\-\-+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
     }
     function randomSlug(length=6){const chars='abcdefghijklmnopqrstuvwxyz0123456789'; let result=''; for(let i=0;i<length;i++){ result+=chars.charAt(Math.floor(Math.random()*chars.length)); } return result; }
@@ -150,7 +154,9 @@
       });
     }
     wireCopy('shortLink','copy1');  wireShare('shortLink','share1');
-    wireCopy('addrLink','copy2');   wireShare('addrLink','share2');
+    
+slugify = function(text) { return text.toString().trim().replace(/\s+/g, '-'); };
+wireCopy('addrLink','copy2');   wireShare('addrLink','share2');
     wireCopy('profileLink','copy3');wireShare('profileLink','share3');
   </script>
 </body>
