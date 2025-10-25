@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, redirect, render_template
 import psycopg2
-import psycopg2.extras
 import os
 import json
 from urllib.parse import quote_plus
@@ -9,11 +8,10 @@ app = Flask(__name__)
 
 
 def get_db_conn():
-    """Create a new database connection using the DATABASE_URL env var"""
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     return conn
 
-# Initialize the database table if it doesn't exist
+
 def init_db():
     with get_db_conn() as conn:
         cur = conn.cursor()
@@ -21,7 +19,7 @@ def init_db():
             """
             CREATE TABLE IF NOT EXISTS links (
                 slug TEXT PRIMARY KEY,
-                target TEXT NOT NULL
+                url TEXT NOT NULL
             );
             """
         )
@@ -41,7 +39,7 @@ def api_shortener():
     with get_db_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO links (slug, target) VALUES (%s, %s) ON CONFLICT (slug) DO UPDATE SET target = EXCLUDED.target;",
+            "INSERT INTO links (slug, url) VALUES (%s, %s) ON CONFLICT (slug) DO UPDATE SET url = EXCLUDED.url;",
             (slug, url),
         )
         conn.commit()
@@ -55,13 +53,12 @@ def api_address():
     slug = data.get("slug")
     if not address or not slug:
         return jsonify({"error": "address and slug required"}), 400
-    # Encode address for Google Maps search
     encoded = quote_plus(address)
     google_url = f"https://www.google.com/maps/search/?api=1&query={encoded}"
     with get_db_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO links (slug, target) VALUES (%s, %s) ON CONFLICT (slug) DO UPDATE SET target = EXCLUDED.target;",
+            "INSERT INTO links (slug, url) VALUES (%s, %s) ON CONFLICT (slug) DO UPDATE SET url = EXCLUDED.url;",
             (slug, google_url),
         )
         conn.commit()
@@ -75,12 +72,11 @@ def api_profile():
     profile = data.get("profile", {})
     if not slug:
         return jsonify({"error": "slug required"}), 400
-    # Store the profile as JSON string
     profile_json = json.dumps(profile, ensure_ascii=False)
     with get_db_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO links (slug, target) VALUES (%s, %s) ON CONFLICT (slug) DO UPDATE SET target = EXCLUDED.target;",
+            "INSERT INTO links (slug, url) VALUES (%s, %s) ON CONFLICT (slug) DO UPDATE SET url = EXCLUDED.url;",
             (slug, profile_json),
         )
         conn.commit()
@@ -91,15 +87,13 @@ def api_profile():
 def redirect_slug(slug):
     with get_db_conn() as conn:
         cur = conn.cursor()
-        cur.execute("SELECT target FROM links WHERE slug = %s;", (slug,))
+        cur.execute("SELECT url FROM links WHERE slug = %s;", (slug,))
         row = cur.fetchone()
     if not row:
         return "Not found", 404
     target = row[0]
-    # Try to load JSON to see if it's a profile; otherwise treat as URL
     try:
         data = json.loads(target)
-        # Return profile as JSON or simple page; here we just return JSON
         return jsonify(data)
     except json.JSONDecodeError:
         return redirect(target)
