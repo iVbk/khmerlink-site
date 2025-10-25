@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ខ្មែរ Link – បង្រួមតំណ & អាសយដ្ឋានងាយ</title>
+  <style>
+    :root{
+      --bg:#0b0d12; --card:#141823; --muted:#97a0b2; --text:#e9eef7; --accent:#5ee2a0;
+      --accent-2:#8ab6ff; --danger:#ff7b7b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Khmer UI,Arial;
+         background:linear-gradient(180deg,#0b0d12 0%,#0e1220 100%); color:var(--text)}
+    a{color:var(--accent-2); text-decoration:none}
+    .wrap{max-width:960px; margin:0 auto; padding:16px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0}
+    .brand{display:flex; align-items:center; gap:10px}
+    .logo{width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+    .brand h1{font-size:18px; margin:0}
+    .nav{display:flex; gap:16px}
+    .nav a{color:var(--text); opacity:0.7}
+    .nav a:hover{opacity:1}
+    h2{margin:32px 0 16px; font-size:24px}
+    form{background:var(--card); padding:16px; border-radius:8px; margin-bottom:24px}
+    label{display:block; margin-bottom:8px; font-weight:600}
+    input[type="text"], input[type="url"], textarea{width:100%; padding:8px; margin-bottom:12px; border:1px solid var(--muted); border-radius:4px; background:transparent; color:var(--text)}
+    button{padding:8px 16px; border:none; border-radius:4px; background:var(--accent); color:#0b0d12; cursor:pointer}
+    button:hover{background:var(--accent-2)}
+    .result{background:var(--card); padding:12px; border-radius:4px; margin-top:12px}
+    .result a{word-break:break-all}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <h1>ខ្មែរ Link</h1>
+      </div>
+      <nav class="nav">
+        <a href="#url">បង្រួមតំណ</a>
+        <a href="#address">អាសយដ្ឋាន</a>
+        <a href="#profile">ប្រវត្តិរូប</a>
+      </nav>
+    </header>
+    <section id="url">
+      <h2>បង្រួមតំណ URL</h2>
+      <form id="urlForm">
+        <label for="longUrl">បញ្ចូលតំណវែង៖</label>
+        <input type="url" id="longUrl" required />
+        <label for="slug">កំណត់អត្តលេខឬស្ថាបនាថ្មី៖</label>
+        <input type="text" id="slug" />
+        <button type="submit">បង្កើតតំណខ្លី</button>
+      </form>
+      <div id="urlResult" class="result" style="display:none">
+        <p>តំណខ្លី៖ <a id="shortLink" href="#" target="_blank"></a></p>
+        <button type="button" id="copy1">ចម្លង</button>
+        <button type="button" id="share1">ចែករំលែក</button>
+      </div>
+    </section>
+    <section id="address">
+      <h2>បង្កើតតំណអាសយដ្ឋាន</h2>
+      <form id="addrForm">
+        <label for="addressText">បញ្ចូលអាសយដ្ឋាន៖</label>
+        <textarea id="addressText" rows="3" required></textarea>
+        <label for="addrSlug">កំណត់អត្តលេខឬស្ថាបនាថ្មី៖</label>
+        <input type="text" id="addrSlug" />
+        <button type="submit">បង្កើតតំណអាសយដ្ឋាន</button>
+      </form>
+      <div id="addrResult" class="result" style="display:none">
+        <p>តំណអាសយដ្ឋាន៖ <a id="addrLink" href="#" target="_blank"></a></p>
+        <button type="button" id="copy2">ចម្លង</button>
+        <button type="button" id="share2">ចែករំលែក</button>
+      </div>
+    </section>
+    <section id="profile">
+      <h2>បង្កើតតំណប្រវត្តិរូប (Linktree)</h2>
+      <form id="profileForm">
+        <label for="profileName">ឈ្មោះឬចំណងជើង៖</label>
+        <input type="text" id="profileName" required />
+        <label for="profileDesc">ការពិពណ៌នា៖</label>
+        <textarea id="profileDesc" rows="3"></textarea>
+        <label for="profileLinks">តំណបន្ថែម (មួយក្នុងមួយបន្ទាត់)៖</label>
+        <textarea id="profileLinks" rows="4" required></textarea>
+        <label for="profileSlug">កំណត់អត្តលេខឬស្ថាបនាថ្មី៖</label>
+        <input type="text" id="profileSlug" />
+        <button type="submit">បង្កើតតំណប្រវត្តិរូប</button>
+      </form>
+      <div id="profileResult" class="result" style="display:none">
+        <p>តំណប្រវត្តិរូប៖ <a id="profileLink" href="#" target="_blank"></a></p>
+        <button type="button" id="copy3">ចម្លង</button>
+        <button type="button" id="share3">ចែករំលែក</button>
+      </div>
+    </section>
+  </div>
+  <script>
+    const apiBase = '';
+    function slugify(text){
+      return text.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^\w\-]+/g,'').replace(/\-\-+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
+    }
+    function randomSlug(length=6){const chars='abcdefghijklmnopqrstuvwxyz0123456789'; let result=''; for(let i=0;i<length;i++){ result+=chars.charAt(Math.floor(Math.random()*chars.length)); } return result; }
+    async function handleForm(formId,inputId,slugId,resultId,linkId){
+      const form=document.getElementById(formId);
+      form.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const input=document.getElementById(inputId).value.trim();
+        let slug=document.getElementById(slugId).value.trim();
+        if(!slug){ slug=randomSlug(); } else { slug=slugify(slug); }
+        let endpoint='';
+        let body={};
+        if(formId==='urlForm'){ endpoint='/api/shortener'; body={url:input, slug}; }
+        else if(formId==='addrForm'){ endpoint='/api/address'; body={address:input, slug}; }
+        else if(formId==='profileForm'){
+          const name=document.getElementById('profileName').value.trim();
+          const desc=document.getElementById('profileDesc').value.trim();
+          const links=document.getElementById('profileLinks').value.trim().split('\n');
+          body={name, desc, links, slug}; endpoint='/api/profile';
+        }
+        try{
+          const res=await fetch(apiBase+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+          const data=await res.json();
+          const shortUrl=window.location.origin+'/'+data.slug;
+          const resultDiv=document.getElementById(resultId);
+          const linkEl=document.getElementById(linkId);
+          linkEl.href=shortUrl;
+          linkEl.textContent=shortUrl;
+          resultDiv.style.display='block';
+        }catch(err){alert('មានបញ្ហា! សូមព្យាយាមម្ដងទៀត');}
+      });
+    }
+    handleForm('urlForm','longUrl','slug','urlResult','shortLink');
+    handleForm('addrForm','addressText','addrSlug','addrResult','addrLink');
+    handleForm('profileForm','profileName','profileSlug','profileResult','profileLink');
+    function wireCopy(linkId,btnId){
+      document.getElementById(btnId).addEventListener('click',()=>{
+        const link=document.getElementById(linkId).textContent;
+        navigator.clipboard.writeText(link).then(()=>{ alert('បានចម្លងតំណទៅកាន់ឃ្លីបពួកកម្មវិធី'); });
+      });
+    }
+    function wireShare(linkId,btnId){
+      document.getElementById(btnId).addEventListener('click',async()=>{
+        const url=document.getElementById(linkId).textContent;
+        const text='ចែករំលែកតំណ៖ '+url;
+        if(navigator.share){
+          try{ await navigator.share({title:'ខ្មែរ Link', text, url}); }catch(e){}
+        }else{
+          alert('Share not supported. Copy instead:\n'+url);
+        }
+      });
+    }
+    wireCopy('shortLink','copy1');  wireShare('shortLink','share1');
+    wireCopy('addrLink','copy2');   wireShare('addrLink','share2');
+    wireCopy('profileLink','copy3');wireShare('profileLink','share3');
+  </script>
+</body>
+</html>
